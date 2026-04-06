@@ -1,7 +1,8 @@
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RecentPosts } from "@/components/dashboard/RecentPosts";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { dashboardStats } from "@/lib/dummy-data";
+import { AlertBanner } from "@/components/dashboard/AlertBanner";
+import { dashboardStats, posts, characters } from "@/lib/dummy-data";
 import {
   FileText,
   CalendarClock,
@@ -16,36 +17,33 @@ import Link from "next/link";
 export default function DashboardPage() {
   return (
     <div className="space-y-8 lg:space-y-10">
-      {/* Welcome Banner */}
-      <div className="glass-glow p-8 lg:p-10">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 shrink-0">
-              <Rocket className="w-7 h-7 text-neon-blue" />
-            </div>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold neon-text tracking-tight">
-                おかえりなさい！
-              </h1>
-              <p className="text-foreground/45 mt-2 text-sm lg:text-base leading-relaxed">
-                今週は{" "}
-                <span className="text-neon-blue font-semibold">{dashboardStats.postsThisWeek} 件</span>
-                の投稿を作成しました。エンゲージメント率は{" "}
-                <span className="text-neon-green font-semibold">{dashboardStats.engagementRate}%</span>
-                です。
-              </p>
-            </div>
-          </div>
-          <Link href="/generate" className="shrink-0">
+      {/* Alert Banner */}
+      <AlertBanner
+        icon={Rocket}
+        title="おかえりなさい！"
+        action={
+          <Link href="/generate">
             <NeonButton variant="primary" size="lg">
               <Sparkles className="w-5 h-5" />
               新しい投稿を生成
             </NeonButton>
           </Link>
-        </div>
-      </div>
+        }
+      >
+        <p>
+          今週は{" "}
+          <span className="text-neon-blue font-semibold">
+            {dashboardStats.postsThisWeek} 件
+          </span>
+          の投稿を作成しました。エンゲージメント率は{" "}
+          <span className="text-neon-green font-semibold">
+            {dashboardStats.engagementRate}%
+          </span>
+          です。
+        </p>
+      </AlertBanner>
 
-      {/* Stats Grid - 4 KPI cards */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6">
         <StatsCard
           title="総投稿数"
@@ -77,7 +75,7 @@ export default function DashboardPage() {
 
       {/* Main Content: Left = Buzz Posts, Right = Quick Actions */}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 lg:gap-8">
-        <RecentPosts />
+        <RecentPosts posts={posts} characters={characters} />
         <QuickActions />
       </div>
     </div>
