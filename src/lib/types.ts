@@ -75,6 +75,20 @@ export interface PostMetric {
 }
 
 // ============================================================
+// Local Scheduled Post (JSON storage, pre-Supabase)
+// ============================================================
+
+export interface LocalScheduledPost {
+  id: string;
+  content: string;
+  platform: PlatformType;
+  scheduledAt: string;
+  status: ScheduleStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================================
 // AI Generation Types
 // ============================================================
 
