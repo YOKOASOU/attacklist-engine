@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Sparkles,
@@ -10,6 +11,8 @@ import {
   Users,
   BookOpen,
   Zap,
+  Menu,
+  X,
 } from "lucide-react";
 
 const navItems = [
@@ -23,24 +26,25 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-sidebar-bg backdrop-blur-xl border-r border-glass-border flex flex-col z-50">
+  const sidebarContent = (
+    <>
       {/* Logo */}
-      <div className="p-6 border-b border-glass-border">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-blue to-neon-purple flex items-center justify-center shadow-[0_0_15px_rgba(0,212,255,0.3)] group-hover:shadow-[0_0_25px_rgba(0,212,255,0.5)] transition-shadow">
+      <div className="p-7 border-b border-glass-border">
+        <Link href="/" className="flex items-center gap-3 group" onClick={() => setMobileOpen(false)}>
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-neon-blue to-neon-purple flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.35)] group-hover:shadow-[0_0_30px_rgba(0,212,255,0.55)] transition-shadow duration-300">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold neon-text">AttackList</h1>
-            <p className="text-xs text-foreground/40">AI Post Engine</p>
+            <h1 className="text-lg font-bold neon-text tracking-tight">AttackList</h1>
+            <p className="text-[11px] text-foreground/35 tracking-widest uppercase">AI Post Engine</p>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-5 space-y-1.5">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -48,13 +52,14 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? "bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 text-neon-blue shadow-[inset_0_0_20px_rgba(0,212,255,0.1)] border border-neon-blue/20"
-                  : "text-foreground/60 hover:text-foreground hover:bg-white/5"
+                  ? "bg-gradient-to-r from-neon-blue/15 to-neon-purple/15 text-neon-blue shadow-[inset_0_0_20px_rgba(0,212,255,0.08),0_0_12px_rgba(0,212,255,0.1)] border border-neon-blue/20"
+                  : "text-foreground/50 hover:text-foreground/80 hover:bg-white/[0.04]"
               }`}
             >
-              <Icon className={`w-5 h-5 ${isActive ? "text-neon-blue" : ""}`} />
+              <Icon className={`w-[18px] h-[18px] ${isActive ? "text-neon-blue drop-shadow-[0_0_6px_rgba(0,212,255,0.5)]" : ""}`} />
               {item.label}
             </Link>
           );
@@ -62,14 +67,48 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-glass-border">
-        <div className="glass p-3 rounded-xl">
-          <p className="text-xs text-foreground/40">Powered by</p>
-          <p className="text-sm font-medium bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+      <div className="p-5 border-t border-glass-border">
+        <div className="glass p-4 rounded-2xl">
+          <p className="text-[10px] text-foreground/30 uppercase tracking-wider">Powered by</p>
+          <p className="text-sm font-semibold mt-0.5 bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
             Claude AI
           </p>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger */}
+      <button
+        className="lg:hidden fixed top-4 left-4 z-[60] p-2.5 rounded-2xl glass cursor-pointer"
+        onClick={() => setMobileOpen(!mobileOpen)}
+      >
+        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex fixed left-0 top-0 h-full w-[272px] bg-sidebar-bg backdrop-blur-2xl border-r border-glass-border flex-col z-50">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile sidebar */}
+      <aside
+        className={`lg:hidden fixed left-0 top-0 h-full w-[272px] bg-sidebar-bg backdrop-blur-2xl border-r border-glass-border flex flex-col z-50 transition-transform duration-300 ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

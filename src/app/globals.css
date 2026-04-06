@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0a0a1a;
+  --color-background: #050510;
   --color-foreground: #e0e0ff;
   --color-neon-blue: #00d4ff;
   --color-neon-purple: #a855f7;
   --color-neon-pink: #ec4899;
   --color-neon-green: #22d3ee;
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
-  --color-glass-hover: rgba(255, 255, 255, 0.08);
-  --color-sidebar-bg: rgba(10, 10, 30, 0.8);
-  --color-card-bg: rgba(15, 15, 40, 0.6);
+  --color-glass: rgba(12, 12, 35, 0.7);
+  --color-glass-border: rgba(100, 130, 255, 0.12);
+  --color-glass-hover: rgba(20, 20, 50, 0.8);
+  --color-sidebar-bg: rgba(8, 8, 24, 0.92);
+  --color-card-bg: rgba(10, 10, 30, 0.75);
   --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 }
@@ -22,43 +22,86 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* Background gradient */
+/* Background gradient - deep navy with subtle color bleed */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
-    var(--color-background);
+    radial-gradient(ellipse 80% 60% at 15% 50%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 40% at 50% 90%, rgba(100, 80, 200, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, #050510 0%, #0a0a20 50%, #080818 100%);
 }
 
-/* Glassmorphism base */
+/* Glassmorphism base with glow border */
 .glass {
   background: var(--color-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--color-glass-border);
-  border-radius: 16px;
+  border-radius: 20px;
 }
 
-.glass:hover {
-  background: var(--color-glass-hover);
+/* Neon border glow - blue to purple gradient border */
+.glass-glow {
+  background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  position: relative;
+  border: 1px solid transparent;
+  background-clip: padding-box;
 }
 
-/* Neon glow */
+.glass-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 21px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.4) 0%,
+    rgba(168, 85, 247, 0.3) 50%,
+    rgba(0, 212, 255, 0.15) 100%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+.glass-glow::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 22px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.15) 0%,
+    rgba(168, 85, 247, 0.1) 50%,
+    transparent 100%
+  );
+  filter: blur(8px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Neon glow shadow */
 .neon-glow {
   box-shadow:
-    0 0 15px rgba(0, 212, 255, 0.3),
-    0 0 30px rgba(168, 85, 247, 0.15);
+    0 0 20px rgba(0, 212, 255, 0.2),
+    0 0 40px rgba(168, 85, 247, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .neon-text {
   text-shadow:
-    0 0 10px rgba(0, 212, 255, 0.5),
-    0 0 20px rgba(168, 85, 247, 0.3);
+    0 0 12px rgba(0, 212, 255, 0.5),
+    0 0 24px rgba(168, 85, 247, 0.25);
 }
 
 /* Scrollbar */
@@ -71,10 +114,16 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.3);
+  background: rgba(168, 85, 247, 0.25);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.5);
+  background: rgba(168, 85, 247, 0.45);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 212, 255, 0.25);
+  color: #fff;
 }

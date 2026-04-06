@@ -17,9 +17,9 @@ export default function RootLayout({
     <html lang="ja" className="h-full antialiased">
       <body className="min-h-full">
         <Sidebar />
-        <div className="ml-64 flex flex-col min-h-screen">
+        <div className="lg:ml-[272px] flex flex-col min-h-screen">
           <Header />
-          <main className="flex-1 p-8">{children}</main>
+          <main className="flex-1 p-5 md:p-8 lg:p-10">{children}</main>
         </div>
       </body>
     </html>

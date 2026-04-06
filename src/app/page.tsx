@@ -1,6 +1,6 @@
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { RecentPosts } from "@/components/dashboard/RecentPosts";
-import { SchedulePreview } from "@/components/dashboard/SchedulePreview";
+import { QuickActions } from "@/components/dashboard/QuickActions";
 import { dashboardStats } from "@/lib/dummy-data";
 import {
   FileText,
@@ -8,26 +8,35 @@ import {
   TrendingUp,
   Users,
   Sparkles,
-  BarChart3,
+  Rocket,
 } from "lucide-react";
 import { NeonButton } from "@/components/ui/NeonButton";
 import Link from "next/link";
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 lg:space-y-10">
       {/* Welcome Banner */}
-      <div className="glass p-8 neon-glow">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold neon-text">
-              おかえりなさい！
-            </h1>
-            <p className="text-foreground/50 mt-2">
-              今週は {dashboardStats.postsThisWeek} 件の投稿を作成しました。エンゲージメント率は {dashboardStats.engagementRate}% です。
-            </p>
+      <div className="glass-glow p-8 lg:p-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 shrink-0">
+              <Rocket className="w-7 h-7 text-neon-blue" />
+            </div>
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold neon-text tracking-tight">
+                おかえりなさい！
+              </h1>
+              <p className="text-foreground/45 mt-2 text-sm lg:text-base leading-relaxed">
+                今週は{" "}
+                <span className="text-neon-blue font-semibold">{dashboardStats.postsThisWeek} 件</span>
+                の投稿を作成しました。エンゲージメント率は{" "}
+                <span className="text-neon-green font-semibold">{dashboardStats.engagementRate}%</span>
+                です。
+              </p>
+            </div>
           </div>
-          <Link href="/generate">
+          <Link href="/generate" className="shrink-0">
             <NeonButton variant="primary" size="lg">
               <Sparkles className="w-5 h-5" />
               新しい投稿を生成
@@ -36,8 +45,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-4 gap-6">
+      {/* Stats Grid - 4 KPI cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 lg:gap-6">
         <StatsCard
           title="総投稿数"
           value={dashboardStats.totalPosts}
@@ -66,38 +75,10 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-3 gap-6">
+      {/* Main Content: Left = Buzz Posts, Right = Quick Actions */}
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 lg:gap-8">
         <RecentPosts />
-        <SchedulePreview />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="glass p-6">
-        <h3 className="text-lg font-semibold mb-4 neon-text flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-neon-blue" />
-          クイックアクション
-        </h3>
-        <div className="flex gap-3">
-          <Link href="/generate">
-            <NeonButton variant="secondary">
-              <Sparkles className="w-4 h-4" />
-              AI投稿生成
-            </NeonButton>
-          </Link>
-          <Link href="/schedule">
-            <NeonButton variant="secondary">
-              <CalendarClock className="w-4 h-4" />
-              予約投稿を管理
-            </NeonButton>
-          </Link>
-          <Link href="/characters">
-            <NeonButton variant="secondary">
-              <Users className="w-4 h-4" />
-              キャラ設定
-            </NeonButton>
-          </Link>
-        </div>
+        <QuickActions />
       </div>
     </div>
   );
