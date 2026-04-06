@@ -51,14 +51,14 @@ const actions = [
     color: "bg-gradient-to-br from-neon-blue to-neon-green",
   },
   {
-    href: "/characters",
+    href: "/persona",
     icon: Users,
-    label: "キャラ設定",
+    label: "ペルソナ設定",
     description: "投稿キャラクターを編集する",
     color: "bg-gradient-to-br from-neon-green to-neon-blue",
   },
   {
-    href: "/notes",
+    href: "/notebook",
     icon: BookOpen,
     label: "学習メモ",
     description: "投稿の学びを記録する",

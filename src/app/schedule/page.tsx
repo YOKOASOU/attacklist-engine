@@ -1,18 +1,16 @@
-import { GlassCard } from "@/components/ui/GlassCard";
-import { CalendarClock } from "lucide-react";
+import { ScheduleCalendar } from "@/components/schedule/ScheduleCalendar";
+import { ScheduleStats } from "@/components/schedule/ScheduleStats";
+import { scheduledPosts, characters } from "@/lib/dummy-data";
 
 export default function SchedulePage() {
+  const pending = scheduledPosts.filter((p) => p.status === "pending").length;
+  const sent = scheduledPosts.filter((p) => p.status === "sent").length;
+  const failed = scheduledPosts.filter((p) => p.status === "failed").length;
+
   return (
     <div className="space-y-8">
-      <GlassCard hover={false}>
-        <div className="flex items-center gap-3 text-foreground/40">
-          <CalendarClock className="w-8 h-8 text-neon-blue" />
-          <div>
-            <h2 className="text-xl font-bold text-foreground">予約投稿</h2>
-            <p className="text-sm">Phase 3で実装予定</p>
-          </div>
-        </div>
-      </GlassCard>
+      <ScheduleStats pending={pending} sent={sent} failed={failed} />
+      <ScheduleCalendar items={scheduledPosts} characters={characters} />
     </div>
   );
 }

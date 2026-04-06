@@ -8,21 +8,21 @@ const pageTitles: Record<string, string> = {
   "/generate": "AI投稿生成",
   "/schedule": "予約投稿",
   "/history": "投稿履歴",
-  "/characters": "キャラ設定",
-  "/notes": "学習メモ",
+  "/notebook": "学習メモ",
+  "/persona": "ペルソナ設定",
+  "/rewrite": "リライト",
+  "/guide": "使い方ガイド",
 };
 
 export function Header() {
   const pathname = usePathname();
-  const title = pageTitles[pathname] || "ダッシュボード";
+  const title = pageTitles[pathname] || "AttackList";
 
   return (
     <header className="h-[72px] border-b border-glass-border bg-sidebar-bg/40 backdrop-blur-xl flex items-center justify-between px-6 lg:px-10">
-      {/* Page title - visible on all screens, offset on mobile for hamburger */}
       <h2 className="text-xl font-bold neon-text pl-12 lg:pl-0">{title}</h2>
 
       <div className="flex items-center gap-3 lg:gap-5">
-        {/* Search - hidden on small screens */}
         <div className="relative hidden md:block">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
           <input
@@ -32,7 +32,6 @@ export function Header() {
           />
         </div>
 
-        {/* Notifications */}
         <button className="relative p-2.5 rounded-2xl hover:bg-white/[0.04] transition-colors cursor-pointer">
           <Bell className="w-5 h-5 text-foreground/50" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-neon-pink rounded-full shadow-[0_0_6px_rgba(236,72,153,0.6)]" />

@@ -10,6 +10,8 @@ import {
   History,
   Users,
   BookOpen,
+  RefreshCw,
+  Compass,
   Zap,
   Menu,
   X,
@@ -20,8 +22,10 @@ const navItems = [
   { href: "/generate", label: "AI投稿生成", icon: Sparkles },
   { href: "/schedule", label: "予約投稿", icon: CalendarClock },
   { href: "/history", label: "投稿履歴", icon: History },
-  { href: "/characters", label: "キャラ設定", icon: Users },
-  { href: "/notes", label: "学習メモ", icon: BookOpen },
+  { href: "/notebook", label: "学習メモ", icon: BookOpen },
+  { href: "/persona", label: "ペルソナ設定", icon: Users },
+  { href: "/rewrite", label: "リライト", icon: RefreshCw },
+  { href: "/guide", label: "使い方ガイド", icon: Compass },
 ];
 
 export function Sidebar() {
@@ -44,7 +48,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-5 space-y-1.5">
+      <nav className="flex-1 p-5 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -53,7 +57,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? "bg-gradient-to-r from-neon-blue/15 to-neon-purple/15 text-neon-blue shadow-[inset_0_0_20px_rgba(0,212,255,0.08),0_0_12px_rgba(0,212,255,0.1)] border border-neon-blue/20"
                   : "text-foreground/50 hover:text-foreground/80 hover:bg-white/[0.04]"
