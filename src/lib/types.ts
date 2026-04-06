@@ -86,6 +86,7 @@ export interface GenerateRequest {
   charCount: number;
   includeCta: boolean;
   platform: PlatformType;
+  persona: string;
 }
 
 export interface GeneratedVariant {

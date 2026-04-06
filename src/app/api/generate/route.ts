@@ -7,8 +7,7 @@ const anthropic = new Anthropic();
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as GenerateRequest;
-
-    const { theme, target, purpose, tone, charCount, includeCta, platform } = body;
+    const { theme, target, purpose, tone, charCount, includeCta, persona } = body;
 
     if (!theme?.trim()) {
       return NextResponse.json(
@@ -17,37 +16,49 @@ export async function POST(request: Request) {
       );
     }
 
-    const platformLabel = {
-      twitter: "X (Twitter)",
-      instagram: "Instagram",
-      threads: "Threads",
-    }[platform] ?? platform;
+    const ctaLine = includeCta
+      ? `- CTA: 含める（読者に具体的な行動を促す一文を末尾に入れる）`
+      : `- CTA: 含めない（ctaフィールドは空文字にする）`;
 
-    const prompt = `あなたはSNS投稿のプロライターです。以下の条件でSNS投稿を3パターン生成してください。
+    const personaLine = persona
+      ? `- ペルソナ情報: ${persona}`
+      : "";
+
+    const prompt = `あなたはX投稿のプロ編集者です。
+以下の条件をもとに、反応が取りやすい日本語の短文投稿を3案作成してください。
 
 ## 条件
 - テーマ: ${theme}
-- ターゲット: ${target || "一般"}
-- 目的: ${purpose || "情報発信"}
-- トーン: ${tone || "カジュアル"}
-- プラットフォーム: ${platformLabel}
-- 目安文字数: ${charCount || 280}文字
-- CTA（行動喚起）: ${includeCta ? "含める" : "含めない"}
+- ターゲット: ${target || "一般のXユーザー"}
+- 目的: ${purpose || "情報発信・認知拡大"}
+- 文体: ${tone || "カジュアル"}
+- 文字数目安: ${charCount || 280}文字
+${ctaLine}
+${personaLine}
+
+## 出力ルール
+- 1案ずつ見出し付き
+- 冒頭1行は強いフック（思わず止まる一文）
+- 改行を活用して読みやすく
+- 読みやすさ重視（一文を短く）
+- 抽象論で終わらず具体性を入れる
+- 日本のXユーザー向けの自然な言い回し
+- 絵文字は控えめに（1〜2個まで）
 
 ## 出力形式
-必ず以下のJSON配列形式で返してください。JSON以外のテキストは含めないでください。
+必ず以下のJSON配列形式のみで返してください。JSON以外のテキスト・コードブロック記号は含めないでください。
 
 [
   {
-    "title": "投稿のタイトル案（10〜20文字）",
-    "hook": "冒頭の1文で読者の注意を引くフック",
-    "body": "本文（${charCount || 280}文字以内）",
-    "cta": "${includeCta ? "読者に取ってほしい行動を促す文" : ""}",
-    "hashtags": ["関連ハッシュタグ1", "関連ハッシュタグ2", "関連ハッシュタグ3"]
+    "title": "この案の見出し（10〜20文字の短いラベル）",
+    "hook": "冒頭の1文。読者の手を止める強いフック。",
+    "body": "本文。改行を含む読みやすい構成。${charCount || 280}文字以内。",
+    "cta": "${includeCta ? "読者に取ってほしい具体的な行動を促す一文" : ""}",
+    "hashtags": ["ハッシュタグ1", "ハッシュタグ2", "ハッシュタグ3"]
   }
 ]
 
-3パターン分を配列で返してください。各パターンはアプローチや切り口を変えてください。`;
+3案それぞれ切り口・アプローチを変えてください。`;
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
@@ -58,7 +69,6 @@ export async function POST(request: Request) {
     const text =
       message.content[0].type === "text" ? message.content[0].text : "";
 
-    // JSONを抽出（コードブロックに包まれている場合も対応）
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       return NextResponse.json(

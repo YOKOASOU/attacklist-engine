@@ -4,6 +4,7 @@ import { useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { NeonButton } from "@/components/ui/NeonButton";
 import { GenerateResultCards } from "@/components/generate/GenerateResultCards";
+import { characters } from "@/lib/dummy-data";
 import type { GenerateRequest, GeneratedVariant, PlatformType } from "@/lib/types";
 import { Sparkles, RefreshCw, AlertTriangle } from "lucide-react";
 
@@ -26,6 +27,7 @@ export function GenerateForm() {
   const [charCount, setCharCount] = useState<number>(280);
   const [includeCta, setIncludeCta] = useState(true);
   const [platform, setPlatform] = useState<PlatformType>("twitter");
+  const [personaId, setPersonaId] = useState("");
 
   // Output state
   const [variants, setVariants] = useState<GeneratedVariant[]>([]);
@@ -42,6 +44,11 @@ export function GenerateForm() {
     setError("");
     setVariants([]);
 
+    const selectedPersona = characters.find((c) => c.id === personaId);
+    const personaText = selectedPersona
+      ? `${selectedPersona.name}（${selectedPersona.personality}、トーン: ${selectedPersona.tone}、得意分野: ${selectedPersona.topics.join("・")}）`
+      : "";
+
     const body: GenerateRequest = {
       theme,
       target,
@@ -50,6 +57,7 @@ export function GenerateForm() {
       charCount,
       includeCta,
       platform,
+      persona: personaText,
     };
 
     try {
@@ -120,6 +128,23 @@ export function GenerateForm() {
               placeholder="例: 認知拡大、集客、教育"
               className="w-full px-4 py-3 rounded-2xl bg-white/[0.04] border border-glass-border text-sm text-foreground placeholder:text-foreground/25 focus:outline-none focus:border-neon-blue/40 transition-all"
             />
+          </div>
+
+          {/* Persona */}
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-foreground/60 mb-2">ペルソナ（任意）</label>
+            <select
+              value={personaId}
+              onChange={(e) => setPersonaId(e.target.value)}
+              className="w-full px-4 py-3 rounded-2xl bg-white/[0.04] border border-glass-border text-sm text-foreground focus:outline-none focus:border-neon-blue/40 transition-all"
+            >
+              <option value="" className="bg-[#0a0a1a]">ペルソナなし（デフォルト）</option>
+              {characters.map((c) => (
+                <option key={c.id} value={c.id} className="bg-[#0a0a1a]">
+                  {c.name} — {c.personality}（{c.tone}）
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Platform */}
