@@ -1,6 +1,6 @@
 import { ScheduleCalendar } from "@/components/schedule/ScheduleCalendar";
 import { ScheduleStats } from "@/components/schedule/ScheduleStats";
-import { scheduledPosts, characters } from "@/lib/dummy-data";
+import { scheduledPosts, posts, characters } from "@/lib/dummy-data";
 
 export default function SchedulePage() {
   const pending = scheduledPosts.filter((p) => p.status === "pending").length;
@@ -10,7 +10,7 @@ export default function SchedulePage() {
   return (
     <div className="space-y-8">
       <ScheduleStats pending={pending} sent={sent} failed={failed} />
-      <ScheduleCalendar items={scheduledPosts} characters={characters} />
+      <ScheduleCalendar items={scheduledPosts} posts={posts} characters={characters} />
     </div>
   );
 }

@@ -92,30 +92,39 @@ export const posts: Post[] = [
 export const scheduledPosts: ScheduledPost[] = [
   {
     id: "sched-1",
-    postId: "post-4",
+    user_id: "demo-user",
+    generated_post_id: "post-4",
     scheduledAt: "2026-04-07T10:00:00Z",
     platform: "twitter",
-    characterId: "char-1",
-    content: "TypeScript 6.0のジェネリクス改善がすごい！解説スレッド👇",
     status: "pending",
+    error_message: null,
+    sent_at: null,
+    created_at: "2026-04-06T08:00:00Z",
+    updated_at: "2026-04-06T08:00:00Z",
   },
   {
     id: "sched-2",
-    postId: "post-5",
+    user_id: "demo-user",
+    generated_post_id: "post-5",
     scheduledAt: "2026-04-07T15:00:00Z",
     platform: "threads",
-    characterId: "char-2",
-    content: "デザインシステムの構築ガイド - 初心者向け完全版",
     status: "pending",
+    error_message: null,
+    sent_at: null,
+    created_at: "2026-04-06T09:00:00Z",
+    updated_at: "2026-04-06T09:00:00Z",
   },
   {
     id: "sched-3",
-    postId: "post-99",
+    user_id: "demo-user",
+    generated_post_id: "post-99",
     scheduledAt: "2026-04-08T09:00:00Z",
     platform: "instagram",
-    characterId: "char-3",
-    content: "成功する起業家の朝のルーティン",
     status: "pending",
+    error_message: null,
+    sent_at: null,
+    created_at: "2026-04-06T10:00:00Z",
+    updated_at: "2026-04-06T10:00:00Z",
   },
 ];
 
@@ -146,3 +155,13 @@ export const dashboardStats: DashboardStats = {
   postsThisWeek: 7,
   engagementRate: 4.2,
 };
+
+// ============================================================
+// Helper: generated_post_id → Post を引くためのマップ
+// ScheduleCalendar等で使用
+// ============================================================
+const postMap = new Map(posts.map((p) => [p.id, p]));
+
+export function getPostForSchedule(generatedPostId: string) {
+  return postMap.get(generatedPostId);
+}

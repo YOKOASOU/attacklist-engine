@@ -1,5 +1,5 @@
 import { GlassCard } from "@/components/ui/GlassCard";
-import { scheduledPosts, characters } from "@/lib/dummy-data";
+import { ScheduledPost, Post, Character } from "@/lib/types";
 import { CalendarClock, AtSign, Camera, MessageCircle } from "lucide-react";
 
 const platformIcon = {
@@ -24,7 +24,13 @@ function formatDate(dateStr: string) {
   });
 }
 
-export function SchedulePreview() {
+interface SchedulePreviewProps {
+  items: ScheduledPost[];
+  posts: Post[];
+  characters: Character[];
+}
+
+export function SchedulePreview({ items, posts, characters }: SchedulePreviewProps) {
   return (
     <GlassCard hover={false}>
       <div className="flex items-center justify-between mb-4">
@@ -32,9 +38,10 @@ export function SchedulePreview() {
         <CalendarClock className="w-5 h-5 text-neon-purple" />
       </div>
       <div className="space-y-3">
-        {scheduledPosts.map((item) => {
+        {items.map((item) => {
           const PlatformIcon = platformIcon[item.platform];
-          const char = characters.find((c) => c.id === item.characterId);
+          const post = posts.find((p) => p.id === item.generated_post_id);
+          const char = post ? characters.find((c) => c.id === post.characterId) : undefined;
           return (
             <div
               key={item.id}
@@ -42,12 +49,14 @@ export function SchedulePreview() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <PlatformIcon className={`w-4 h-4 ${platformColor[item.platform]}`} />
-                <span className="text-xs text-foreground/50">{char?.name}</span>
+                <span className="text-xs text-foreground/50">{char?.name ?? "不明"}</span>
                 <span className="text-xs text-neon-blue ml-auto">
                   {formatDate(item.scheduledAt)}
                 </span>
               </div>
-              <p className="text-sm text-foreground/70 line-clamp-2">{item.content}</p>
+              <p className="text-sm text-foreground/70 line-clamp-2">
+                {post?.content ?? "(投稿データなし)"}
+              </p>
             </div>
           );
         })}

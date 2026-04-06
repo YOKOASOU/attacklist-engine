@@ -1,5 +1,5 @@
 import { GlassCard } from "@/components/ui/GlassCard";
-import { ScheduledPost, Character } from "@/lib/types";
+import { ScheduledPost, Post, Character } from "@/lib/types";
 import { CalendarClock, AtSign, Camera, MessageCircle } from "lucide-react";
 
 const platformIcon = {
@@ -18,6 +18,14 @@ const statusBadge = {
   pending: "bg-neon-blue/10 text-neon-blue border-neon-blue/20",
   sent: "bg-neon-green/10 text-neon-green border-neon-green/20",
   failed: "bg-red-500/10 text-red-400 border-red-500/20",
+  cancelled: "bg-foreground/10 text-foreground/50 border-foreground/10",
+};
+
+const statusLabel = {
+  pending: "待機中",
+  sent: "送信済",
+  failed: "失敗",
+  cancelled: "キャンセル",
 };
 
 function formatDate(dateStr: string) {
@@ -32,10 +40,11 @@ function formatDate(dateStr: string) {
 
 interface ScheduleCalendarProps {
   items: ScheduledPost[];
+  posts: Post[];
   characters: Character[];
 }
 
-export function ScheduleCalendar({ items, characters }: ScheduleCalendarProps) {
+export function ScheduleCalendar({ items, posts, characters }: ScheduleCalendarProps) {
   return (
     <GlassCard hover={false} glow>
       <div className="flex items-center gap-2.5 mb-6">
@@ -53,7 +62,9 @@ export function ScheduleCalendar({ items, characters }: ScheduleCalendarProps) {
         <div className="space-y-3">
           {items.map((item) => {
             const PlatformIcon = platformIcon[item.platform];
-            const char = characters.find((c) => c.id === item.characterId);
+            const post = posts.find((p) => p.id === item.generated_post_id);
+            const char = post ? characters.find((c) => c.id === post.characterId) : undefined;
+            const content = post?.content ?? "(投稿データなし)";
             return (
               <div
                 key={item.id}
@@ -63,15 +74,15 @@ export function ScheduleCalendar({ items, characters }: ScheduleCalendarProps) {
                   {char?.avatar ?? "?"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-foreground/85 leading-relaxed">{item.content}</p>
+                  <p className="text-sm text-foreground/85 leading-relaxed">{content}</p>
                   <div className="flex items-center gap-3 mt-3 flex-wrap">
                     <div className="flex items-center gap-1.5">
                       <PlatformIcon className={`w-3.5 h-3.5 ${platformColor[item.platform]}`} />
-                      <span className="text-xs text-foreground/40">{char?.name}</span>
+                      <span className="text-xs text-foreground/40">{char?.name ?? "不明"}</span>
                     </div>
                     <span className="text-xs text-neon-blue">{formatDate(item.scheduledAt)}</span>
                     <span className={`text-[11px] px-2.5 py-0.5 rounded-full border ml-auto shrink-0 ${statusBadge[item.status]}`}>
-                      {item.status === "pending" ? "待機中" : item.status === "sent" ? "送信済" : "失敗"}
+                      {statusLabel[item.status]}
                     </span>
                   </div>
                 </div>
