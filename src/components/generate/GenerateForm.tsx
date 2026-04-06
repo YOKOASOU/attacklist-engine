@@ -3,61 +3,129 @@
 import { useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { NeonButton } from "@/components/ui/NeonButton";
-import { characters } from "@/lib/dummy-data";
-import { Sparkles, Copy, RefreshCw } from "lucide-react";
+import { GenerateResultCards } from "@/components/generate/GenerateResultCards";
+import type { GenerateRequest, GeneratedVariant, PlatformType } from "@/lib/types";
+import { Sparkles, RefreshCw, AlertTriangle } from "lucide-react";
 
-const platforms = [
+const platforms: { value: PlatformType; label: string }[] = [
   { value: "twitter", label: "X (Twitter)" },
   { value: "instagram", label: "Instagram" },
   { value: "threads", label: "Threads" },
-] as const;
+];
 
-const tones = ["カジュアル", "プロフェッショナル", "ユーモア", "インスピレーション"] as const;
+const tones = ["カジュアル", "プロフェッショナル", "ユーモア", "インスピレーション", "煽り系"] as const;
+
+const charCounts = [140, 280, 500, 1000] as const;
 
 export function GenerateForm() {
-  const [topic, setTopic] = useState("");
-  const [platform, setPlatform] = useState<string>("twitter");
-  const [characterId, setCharacterId] = useState(characters[0].id);
+  // Input state
+  const [theme, setTheme] = useState("");
+  const [target, setTarget] = useState("");
+  const [purpose, setPurpose] = useState("");
   const [tone, setTone] = useState<string>(tones[0]);
-  const [generated, setGenerated] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [charCount, setCharCount] = useState<number>(280);
+  const [includeCta, setIncludeCta] = useState(true);
+  const [platform, setPlatform] = useState<PlatformType>("twitter");
 
-  const handleGenerate = () => {
+  // Output state
+  const [variants, setVariants] = useState<GeneratedVariant[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleGenerate = async () => {
+    if (!theme.trim()) {
+      setError("テーマを入力してください");
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      setGenerated(
-        `【${topic || "AIの最新動向"}について】\n\n${
-          tone === "ユーモア"
-            ? "知ってました？AIが進化しすぎて、もう人間がAIに仕事を教わる時代です😂"
-            : "AIの進化は止まりません。最新のトレンドを押さえて、一歩先を行きましょう。"
-        }\n\n#AI #テクノロジー #最新情報`
-      );
+    setError("");
+    setVariants([]);
+
+    const body: GenerateRequest = {
+      theme,
+      target,
+      purpose,
+      tone,
+      charCount,
+      includeCta,
+      platform,
+    };
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "生成に失敗しました");
+        return;
+      }
+
+      setVariants(data.variants);
+    } catch {
+      setError("ネットワークエラーが発生しました");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
+    <div className="space-y-8">
       {/* Input Panel */}
       <GlassCard hover={false} glow>
-        <h3 className="text-lg font-bold neon-text mb-6">投稿設定</h3>
-        <div className="space-y-5">
-          {/* Topic */}
-          <div>
-            <label className="block text-sm font-medium text-foreground/60 mb-2">トピック</label>
+        <h3 className="text-lg font-bold neon-text mb-6">
+          <Sparkles className="w-5 h-5 inline-block mr-2 text-neon-purple" />
+          投稿設定
+        </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-5">
+          {/* Theme */}
+          <div className="lg:col-span-2">
+            <label className="block text-sm font-medium text-foreground/60 mb-2">
+              テーマ <span className="text-neon-pink">*</span>
+            </label>
             <textarea
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
               placeholder="投稿のテーマやキーワードを入力..."
               rows={3}
               className="w-full px-4 py-3 rounded-2xl bg-white/[0.04] border border-glass-border text-sm text-foreground placeholder:text-foreground/25 focus:outline-none focus:border-neon-blue/40 transition-all resize-none"
             />
           </div>
 
+          {/* Target */}
+          <div>
+            <label className="block text-sm font-medium text-foreground/60 mb-2">ターゲット</label>
+            <input
+              type="text"
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+              placeholder="例: 20代エンジニア、起業家"
+              className="w-full px-4 py-3 rounded-2xl bg-white/[0.04] border border-glass-border text-sm text-foreground placeholder:text-foreground/25 focus:outline-none focus:border-neon-blue/40 transition-all"
+            />
+          </div>
+
+          {/* Purpose */}
+          <div>
+            <label className="block text-sm font-medium text-foreground/60 mb-2">目的</label>
+            <input
+              type="text"
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              placeholder="例: 認知拡大、集客、教育"
+              className="w-full px-4 py-3 rounded-2xl bg-white/[0.04] border border-glass-border text-sm text-foreground placeholder:text-foreground/25 focus:outline-none focus:border-neon-blue/40 transition-all"
+            />
+          </div>
+
           {/* Platform */}
           <div>
             <label className="block text-sm font-medium text-foreground/60 mb-2">プラットフォーム</label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {platforms.map((p) => (
                 <button
                   key={p.value}
@@ -74,20 +142,24 @@ export function GenerateForm() {
             </div>
           </div>
 
-          {/* Character */}
+          {/* Char Count */}
           <div>
-            <label className="block text-sm font-medium text-foreground/60 mb-2">キャラクター</label>
-            <select
-              value={characterId}
-              onChange={(e) => setCharacterId(e.target.value)}
-              className="w-full px-4 py-3 rounded-2xl bg-white/[0.04] border border-glass-border text-sm text-foreground focus:outline-none focus:border-neon-blue/40 transition-all"
-            >
-              {characters.map((c) => (
-                <option key={c.id} value={c.id} className="bg-[#0a0a1a]">
-                  {c.name} - {c.tone}
-                </option>
+            <label className="block text-sm font-medium text-foreground/60 mb-2">目安文字数</label>
+            <div className="flex gap-2 flex-wrap">
+              {charCounts.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCharCount(c)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                    charCount === c
+                      ? "bg-neon-green/15 text-neon-green border border-neon-green/30"
+                      : "bg-white/[0.03] text-foreground/50 border border-glass-border hover:bg-white/[0.06]"
+                  }`}
+                >
+                  {c}文字
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
           {/* Tone */}
@@ -110,53 +182,89 @@ export function GenerateForm() {
             </div>
           </div>
 
-          <NeonButton variant="primary" size="lg" className="w-full" onClick={handleGenerate} disabled={loading}>
+          {/* CTA Toggle */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIncludeCta(!includeCta)}
+              className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${
+                includeCta ? "bg-neon-blue/40" : "bg-white/10"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white transition-transform ${
+                  includeCta ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+            <span className="text-sm text-foreground/60">CTA（行動喚起）を含める</span>
+          </div>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mt-5 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-300">{error}</p>
+          </div>
+        )}
+
+        {/* Generate Button */}
+        <div className="mt-6">
+          <NeonButton
+            variant="primary"
+            size="lg"
+            className="w-full"
+            onClick={handleGenerate}
+            disabled={loading}
+          >
             {loading ? (
               <>
                 <RefreshCw className="w-5 h-5 animate-spin" />
-                生成中...
+                AIが3パターン生成中...
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5" />
-                AIで投稿を生成
+                AIで3パターン生成
               </>
             )}
           </NeonButton>
         </div>
       </GlassCard>
 
-      {/* Output Panel */}
-      <GenerateOutput content={generated} />
+      {/* Loading Skeleton */}
+      {loading && <GenerateLoadingSkeleton />}
+
+      {/* Results */}
+      {!loading && variants.length > 0 && (
+        <GenerateResultCards variants={variants} platform={platform} />
+      )}
     </div>
   );
 }
 
-function GenerateOutput({ content }: { content: string }) {
+function GenerateLoadingSkeleton() {
   return (
-    <GlassCard hover={false}>
-      <h3 className="text-lg font-bold neon-text mb-6">生成結果</h3>
-      {content ? (
-        <div className="space-y-4">
-          <div className="p-5 rounded-2xl bg-white/[0.02] border border-glass-border min-h-[200px] whitespace-pre-wrap text-sm text-foreground/85 leading-relaxed">
-            {content}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {[0, 1, 2].map((i) => (
+        <GlassCard key={i} hover={false} className="animate-pulse">
+          <div className="h-5 w-32 bg-white/[0.06] rounded-lg mb-4" />
+          <div className="h-4 w-full bg-white/[0.04] rounded-lg mb-3" />
+          <div className="space-y-2 mb-4">
+            <div className="h-3 w-full bg-white/[0.03] rounded-lg" />
+            <div className="h-3 w-5/6 bg-white/[0.03] rounded-lg" />
+            <div className="h-3 w-4/6 bg-white/[0.03] rounded-lg" />
+            <div className="h-3 w-full bg-white/[0.03] rounded-lg" />
+            <div className="h-3 w-3/4 bg-white/[0.03] rounded-lg" />
           </div>
-          <div className="flex gap-3">
-            <NeonButton variant="secondary" size="sm" onClick={() => navigator.clipboard.writeText(content)}>
-              <Copy className="w-4 h-4" />
-              コピー
-            </NeonButton>
-            <NeonButton variant="ghost" size="sm">
-              予約投稿に追加
-            </NeonButton>
+          <div className="h-4 w-48 bg-white/[0.04] rounded-lg mb-4" />
+          <div className="flex gap-2">
+            <div className="h-6 w-16 bg-white/[0.04] rounded-full" />
+            <div className="h-6 w-20 bg-white/[0.04] rounded-full" />
+            <div className="h-6 w-14 bg-white/[0.04] rounded-full" />
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Sparkles className="w-12 h-12 text-foreground/15 mb-4" />
-          <p className="text-foreground/40 text-sm">左の設定からAI投稿を生成してください</p>
-        </div>
-      )}
-    </GlassCard>
+        </GlassCard>
+      ))}
+    </div>
   );
 }

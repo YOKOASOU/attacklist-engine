@@ -75,6 +75,33 @@ export interface PostMetric {
 }
 
 // ============================================================
+// AI Generation Types
+// ============================================================
+
+export interface GenerateRequest {
+  theme: string;
+  target: string;
+  purpose: string;
+  tone: string;
+  charCount: number;
+  includeCta: boolean;
+  platform: PlatformType;
+}
+
+export interface GeneratedVariant {
+  id: string;
+  title: string;
+  hook: string;
+  body: string;
+  cta: string;
+  hashtags: string[];
+}
+
+export interface GenerateResponse {
+  variants: GeneratedVariant[];
+}
+
+// ============================================================
 // Legacy aliases (既存コンポーネントとの互換)
 // ============================================================
 
